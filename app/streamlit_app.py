@@ -28,8 +28,8 @@ st.set_page_config(page_title="ASD Screening Tool", layout="centered")
 st.title("Autism Spectrum Disorder (ASD) Screening")
 
 # Filenames (must be in same folder or repo)
-MODEL_FILE = "asd_model_calibrated.joblib"
-SCALER_FILE = "scaler.joblib"
+MODEL_FILE = "models/asd_model_calibrated.joblib"
+SCALER_FILE = "models/scaler.joblib"
 META_FILE = "asd_metadata.json"
 
 # If your files are inside a subfolder (e.g., models/), adjust paths accordingly:
