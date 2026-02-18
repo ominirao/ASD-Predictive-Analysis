@@ -23,6 +23,7 @@ import numpy as np
 import json
 import os
 import traceback
+import pandas as pd  # for the chart
 
 st.set_page_config(page_title="ASD Screening Tool", layout="centered")
 st.title("Autism Spectrum Disorder (ASD) Screening")
@@ -31,11 +32,6 @@ st.title("Autism Spectrum Disorder (ASD) Screening")
 MODEL_FILE = "models/asd_model_calibrated.joblib"
 SCALER_FILE = "models/scaler.joblib"
 META_FILE = "asd_metadata.json"
-
-# If your files are inside a subfolder (e.g., models/), adjust paths accordingly:
-# MODEL_FILE = "models/asd_model_calibrated.joblib"
-# SCALER_FILE = "models/scaler.joblib"
-# META_FILE = "asd_metadata.json"
 
 # Check files exist
 if not (os.path.exists(MODEL_FILE) and os.path.exists(SCALER_FILE) and os.path.exists(META_FILE)):
@@ -191,6 +187,7 @@ if st.button("Assess ASD Risk"):
         st.stop()
 
     # Compute ASD probability using asd_index if available, else show full probs
+    # Also ensure asd_prob is set for chart even when predict_proba is not available
     if probs is not None and asd_index is not None:
         asd_prob = probs[asd_index]
         # show both probabilities if binary
@@ -204,7 +201,23 @@ if st.button("Assess ASD Risk"):
         else:
             st.write(f"ASD probability (label={asd_label}): **{asd_prob*100:.1f}%**")
     else:
-        st.write("Model does not support probability output. Predicted class:", str(pred))
+        # fallback: use predicted class as probability 100% for predicted label, 0% otherwise
+        try:
+            asd_prob = 1.0 if str(pred) == str(asd_label) else 0.0
+        except Exception:
+            asd_prob = 0.0
+        st.write("Model does not support probability output. Predicted class: " + str(pred))
+
+    # --- NEW: visualization for BI/analyst presentation ---
+    try:
+        risk_data = pd.DataFrame({
+            "Category": ["ASD Risk", "No ASD Risk"],
+            "Probability": [asd_prob, max(0.0, 1 - asd_prob)]
+        })
+        st.markdown("#### Risk probability")
+        st.bar_chart(risk_data.set_index("Category"))
+    except Exception:
+        st.info("Could not render risk chart (see logs).")
 
     # Interpret prediction using ASD label
     is_positive = (str(pred) == str(asd_label))
