@@ -1,6 +1,24 @@
 # streamlit_app.py
+# Small bootstrap: if joblib missing in the environment, install it at runtime,
+# then continue to import and run the app.
+import sys
+import subprocess
+import importlib
+
+# ---- Bootstrap to ensure joblib is available ----
+try:
+    import joblib
+except Exception:
+    try:
+        # Try to install a known-compatible version
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "joblib==1.3.2"])
+        joblib = importlib.import_module("joblib")
+    except Exception as e:
+        # If installation fails, log and raise so Streamlit shows error
+        raise RuntimeError("Failed to install joblib at runtime: " + str(e))
+
+# ---- Now normal imports ----
 import streamlit as st
-import joblib
 import numpy as np
 import json
 import os
@@ -9,14 +27,19 @@ import traceback
 st.set_page_config(page_title="ASD Screening Tool", layout="centered")
 st.title("Autism Spectrum Disorder (ASD) Screening")
 
-# Filenames (must be in same folder)
+# Filenames (must be in same folder or repo)
 MODEL_FILE = "asd_model_calibrated.joblib"
 SCALER_FILE = "scaler.joblib"
 META_FILE = "asd_metadata.json"
 
+# If your files are inside a subfolder (e.g., models/), adjust paths accordingly:
+# MODEL_FILE = "models/asd_model_calibrated.joblib"
+# SCALER_FILE = "models/scaler.joblib"
+# META_FILE = "asd_metadata.json"
+
 # Check files exist
 if not (os.path.exists(MODEL_FILE) and os.path.exists(SCALER_FILE) and os.path.exists(META_FILE)):
-    st.error("Required files missing. Please place 'asd_model_calibrated.joblib', 'scaler.joblib', and 'asd_metadata.json' in this folder.")
+    st.error("Required files missing. Please place model, scaler, and metadata in this folder (or update paths).")
     st.stop()
 
 # Load artifacts
@@ -26,7 +49,7 @@ try:
     with open(META_FILE, "r") as f:
         metadata = json.load(f)
 except Exception:
-    st.error("Failed to load model/scaler/metadata. See traceback in terminal.")
+    st.error("Failed to load model/scaler/metadata. See traceback in app logs.")
     st.caption(traceback.format_exc())
     st.stop()
 
