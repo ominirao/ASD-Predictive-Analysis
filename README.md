@@ -1,12 +1,15 @@
-# Autism Spectrum Disorder (ASD) Screening Web App
+# 🧠 Autism Spectrum Disorder (ASD) Screening Web App
 
-This project is a Machine Learning-based web application that predicts Autism Spectrum Disorder (ASD) risk using behavioral screening questions.
+🔗 **Live Demo:** https://asd-predictive-analysis-ufhqomajchndsug9yuveyr.streamlit.app 
+💻 **GitHub Repository:** https://github.com/ominirao/ASD-Predictive-Analysis  
 
 ---
 
-## 🚀 Project Overview
+## 📌 Project Overview
 
-The model predicts ASD probability based on:
+This project is a Machine Learning-based web application that predicts Autism Spectrum Disorder (ASD) risk using behavioral screening indicators.
+
+The model estimates ASD probability based on:
 
 - 10 behavioral yes/no screening questions
 - Age
@@ -14,71 +17,97 @@ The model predicts ASD probability based on:
 - Jaundice at birth
 - Family history of ASD
 
-The model was trained using:
+The application provides:
+
+- Calibrated probability output
+- Severity estimation
+- Real-time interactive predictions
+- Public cloud deployment
+
+---
+
+## ⚙️ Machine Learning Pipeline
+
+The model was built using:
 
 - Random Forest Classifier
-- SMOTE (class balancing)
-- Probability calibration (Isotonic Regression)
-- Feature scaling
-
-The web interface is built using Streamlit.
-
----
-
-## 📊 Model Features
-
-- 80/20 stratified train-test split
-- Balanced training dataset
-- Calibrated probability outputs
-- Clean web interface for real-time predictions
+- SMOTE (Synthetic Minority Oversampling Technique)
+- Probability Calibration (Isotonic Regression)
+- Feature Scaling
+- Stratified 80/20 Train-Test Split
 
 ---
 
-## 🖥️ How to Run Locally (Mac)
+## 📊 Model Performance
 
-1. Open Terminal
+- Accuracy: 94.32%
+- Precision: 94.11%
+- Recall: 84.21%
+- F1 Score: 88.88%
+- ROC-AUC: 0.97
 
-2. Go to project folder:
-cd /Users/ominirao/ASD_Project
+*(Metrics obtained from validation dataset — see training notebook for full evaluation.)*
 
-3. Create virtual environment:
-cd /Users/ominirao/ASD_Project
+---
 
-4. Install dependencies:
+## 🌍 Deployment
+
+The application is deployed publicly using **Streamlit Cloud**.
+
+To access the live application:
+
+👉 **Click the Live Demo link above**
+
+---
+
+## 🖥️ Running Locally (Optional)
+
+If you would like to run the application locally:
+
+1️⃣ Clone the repository:
+git clone https://github.com/ominirao/asd-predictive-analysis.git
+cd asd-predictive-analysis
+
+2️⃣ Create virtual environment:
+python3 -m venv venv
+source venv/bin/activate
+
+3️⃣ Install dependencies:
 pip install -r requirements.txt
 
-5. Run the app:
-pip install -r requirements.txt
+4️⃣ Run the app:
+streamlit run ASD_Project/app/streamlit_app.py
 
-6. Open browser:
-http://localhost:8501
-
+The application will then be available locally.
 
 ---
 
 ## 📁 Project Structure
-ASD_Project/
+
+ASD-Predictive-Analysis/
 │
-├── streamlit_app.py
-├── asd_model_calibrated.joblib
-├── scaler.joblib
+├── app/
+│ └── streamlit_app.py
+├── models/
+│ ├── asd_model_calibrated.joblib
+│ └── scaler.joblib
 ├── asd_metadata.json
 ├── requirements.txt
 ├── README.md
-└── .gitignore
-
+└── notebooks/
+│ └── train_asd_colab.ipynb
 
 ---
 
 ## ⚠️ Disclaimer
 
-This tool is for educational purposes only and is not a medical diagnostic tool.  
-Please consult a healthcare professional for clinical diagnosis.
+This tool is intended for educational and research purposes only.  
+It is **not a medical diagnostic tool**.  
+For professional diagnosis, please consult a qualified healthcare provider.
 
 ---
 
 ## 👤 Author
 
 Omini Rao  
-Machine Learning & Data Analytics
-
+Machine Learning | Data Analytics | Business Intelligence
