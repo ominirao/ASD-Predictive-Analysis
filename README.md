@@ -26,6 +26,23 @@ The application provides:
 
 ---
 
+## 🎯 Business Impact
+
+This project demonstrates how behavioral screening data can be transformed into actionable risk insights using data analytics and predictive modeling.
+
+Key outcomes:
+
+- Cleaned and transformed raw behavioral and demographic data
+- Identified key risk indicators using feature analysis
+- Built a calibrated probability model for risk scoring
+- Translated technical outputs into user-friendly severity categories
+- Deployed an interactive dashboard for real-time decision support
+
+This project showcases an end-to-end data workflow:
+Data Collection → Data Cleaning → Feature Engineering → Model Development → Evaluation → Deployment.
+
+---
+
 ## ⚙️ Machine Learning Pipeline
 
 The model was built using:
