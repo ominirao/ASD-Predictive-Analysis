@@ -60,22 +60,22 @@ To access the live application:
 
 ---
 
-## 🖥️ Running Locally (Optional)
+## 🖥️ Running Locally
 
 If you would like to run the application locally:
 
-1️⃣ Clone the repository:
-git clone https://github.com/ominirao/asd-predictive-analysis.git
+1️⃣ Clone the repository:                                      
+git clone https://github.com/ominirao/asd-predictive-analysis.git                        
 cd asd-predictive-analysis
 
-2️⃣ Create virtual environment:
-python3 -m venv venv
+2️⃣ Create virtual environment:                           
+python3 -m venv venv                           
 source venv/bin/activate
 
-3️⃣ Install dependencies:
+3️⃣ Install dependencies:                            
 pip install -r requirements.txt
 
-4️⃣ Run the app:
+4️⃣ Run the app:                                           
 streamlit run ASD_Project/app/streamlit_app.py
 
 The application will then be available locally.
@@ -84,18 +84,18 @@ The application will then be available locally.
 
 ## 📁 Project Structure
 
-ASD-Predictive-Analysis/
-│
-├── app/
-│ └── streamlit_app.py
-├── models/
-│ ├── asd_model_calibrated.joblib
-│ └── scaler.joblib
-├── asd_metadata.json
-├── requirements.txt
-├── README.md
-└── notebooks/
-│ └── train_asd_colab.ipynb
+ASD-Predictive-Analysis/                                     
+│                                                   
+├── app/                                                           
+│ └── streamlit_app.py                                                 
+├── models/                                                                     
+│ ├── asd_model_calibrated.joblib                                             
+│ └── scaler.joblib                                                     
+├── asd_metadata.json                                                          
+├── requirements.txt                                                            
+├── README.md                                                            
+└── notebooks/                                                             
+│ └── train_asd_colab.ipynb                                                      
 
 ---
 
