@@ -26,6 +26,16 @@ The application provides:
 
 ---
 
+## 📸 Application Preview
+
+### Input Interface
+<img width="2000" height="1000" alt="F994AAB5-FC18-4EE3-85EE-8B50FB08C75A" src="https://github.com/user-attachments/assets/014dfb53-e7df-4ac6-9ef5-79ec789d1578" />
+
+### Prediction Output & Visualization
+<img width="2000" height="1000" alt="94347DF7-9C2C-4A42-B59F-46619557738C" src="https://github.com/user-attachments/assets/751fb05e-fc1f-4264-8a4f-3770e05680ac" />
+
+---
+
 ## 🎯 Business Impact
 
 This project demonstrates how behavioral screening data can be transformed into actionable risk insights using data analytics and predictive modeling.
