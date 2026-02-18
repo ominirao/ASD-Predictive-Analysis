@@ -203,15 +203,6 @@ if st.button("Assess ASD Risk"):
             st.write(f"Non-ASD probability: **{other_prob*100:.1f}%** (label={other_label})")
         else:
             st.write(f"ASD probability (label={asd_label}): **{asd_prob*100:.1f}%**")
-import pandas as pd
-
-risk_data = pd.DataFrame({
-    "Category": ["ASD Risk", "No ASD Risk"],
-    "Probability": [asd_prob, 1 - asd_prob]
-})
-
-st.bar_chart(risk_data.set_index("Category"))
-
     else:
         st.write("Model does not support probability output. Predicted class:", str(pred))
 
