@@ -38,7 +38,7 @@ Key outcomes:
 - Translated technical outputs into user-friendly severity categories
 - Deployed an interactive dashboard for real-time decision support
 
-This project showcases an end-to-end data workflow:       
+This project showcases an end-to-end data workflow:                                                               
 Data Collection → Data Cleaning → Feature Engineering → Model Development → Evaluation → Deployment.
 
 ---
