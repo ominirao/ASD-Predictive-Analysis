@@ -1,6 +1,6 @@
 # 🧠 Autism Spectrum Disorder (ASD) Screening Web App
 
-🔗 **Live Demo:** https://asd-predictive-analysis-ufhqomajchndsug9yuveyr.streamlit.app
+🔗 **Live Demo:** https://asd-predictive-analysis-ufhqomajchndsug9yuveyr.streamlit.app                         
 💻 **GitHub Repository:** https://github.com/ominirao/ASD-Predictive-Analysis  
 
 ---
