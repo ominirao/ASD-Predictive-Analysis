@@ -14,7 +14,7 @@ import streamlit as st
 # Page config
 st.set_page_config(page_title="ASD Risk Dashboard", layout="wide")
 st.title("🧠 Autism Spectrum Disorder (ASD) Risk Dashboard")
-st.markdown("Data-driven behavioral screening assessment tool — results appear below inputs for convenience")
+st.markdown("Data-driven behavioral screening assessment tool")
 
 # File paths (adjust if needed)
 MODEL_FILE = "models/asd_model_calibrated.joblib"
@@ -243,4 +243,3 @@ if run_button:
         st.write(f"- **Calibrated ASD probability:** **{asd_prob*100:.1f}%**")
         st.write(f"- **Severity (heuristic):** **{severity}** based on {score} positive responses")
         st.info("This tool is for educational purposes only and is not a medical diagnosis.")
-
