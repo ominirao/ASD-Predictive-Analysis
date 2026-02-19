@@ -1,5 +1,5 @@
 # app/streamlit_app.py
-# Dashboard with inputs in main area (not sidebar)
+# Inputs in main area; results render directly below the inputs so user doesn't need to scroll.
 
 import os
 import json
@@ -14,7 +14,7 @@ import streamlit as st
 # Page config
 st.set_page_config(page_title="ASD Risk Dashboard", layout="wide")
 st.title("🧠 Autism Spectrum Disorder (ASD) Risk Dashboard")
-st.markdown("Data-driven behavioral screening assessment tool — inputs visible in main view")
+st.markdown("Data-driven behavioral screening assessment tool — results appear below inputs for convenience")
 
 # File paths (adjust if needed)
 MODEL_FILE = "models/asd_model_calibrated.joblib"
@@ -66,12 +66,12 @@ questions_text = [
     "10. Imaginative play"
 ]
 
-# Layout: two main columns — left for inputs (always visible), right for KPIs + chart
-left_col, right_col = st.columns([3, 2])
+# Layout: left column for inputs + immediate results, right column for notes/auxiliary
+left_col, right_col = st.columns([3, 1])
 
 with left_col:
     st.header("Screening Questions (Main View)")
-    # show questions in 2 columns inside left_col for compactness
+    # show questions in 2 small columns inside left_col
     qcols = st.columns(2)
     answers = []
     for i, q in enumerate(questions_text):
@@ -95,139 +95,152 @@ with left_col:
     # Run button in left column
     run_button = st.button("Run Assessment", key="run_assessment")
 
+    # immediate results container directly below inputs (so it's visible where user clicked)
+    results_container = st.container()
+
 with right_col:
-    # placeholders for KPIs and chart; will be updated after running
-    kpi_prob = st.empty()
-    kpi_sev = st.empty()
-    st.markdown("### Risk Distribution")
-    chart_placeholder = st.empty()
-    st.markdown("---")
     st.markdown("### Quick notes")
     st.markdown("- Probabilities are calibrated and expressed as percentage.")
     st.markdown("- Severity is a simple heuristic based on number of 'Yes' responses.")
+    st.markdown("---")
+    st.markdown("### Recent runs")
+    # small session-run history (non-persistent)
+    if "history" not in st.session_state:
+        st.session_state.history = []
+    # show last 5 history rows
+    if st.session_state.history:
+        hist_df = pd.DataFrame(st.session_state.history[-5:], columns=["ASD_prob", "Severity"])
+        st.table(hist_df)
+    else:
+        st.write("No runs this session yet.")
 
-# If user pressed Run Assessment, compute prediction and update right column
+# If user pressed Run Assessment, compute prediction and render inside results_container
 if run_button:
-    # Build input mapping from metadata order
-    input_dict = {}
-    for i, col in enumerate(question_cols[: len(questions_text)]):
-        input_dict[col] = answers[i]
+    with results_container:
+        st.subheader("Assessment Results")
 
-    # add demographic fields if present in metadata
-    if age_col:
-        input_dict[age_col] = age
-    if gender_col:
-        input_dict[gender_col] = gender_val
-    if jaundice_col:
-        input_dict[jaundice_col] = jaundice_val
-    if family_col:
-        input_dict[family_col] = family_val
+        # Build input mapping from metadata order
+        input_dict = {}
+        for i, col in enumerate(question_cols[: len(questions_text)]):
+            input_dict[col] = answers[i]
 
-    # Build ordered vector according to feature_cols
-    try:
-        input_vector = [input_dict.get(col, 0) for col in feature_cols]
-    except Exception:
-        st.error("Failed to construct input vector from metadata feature columns.")
-        st.text_area("Traceback", traceback.format_exc(), height=300)
-        st.stop()
+        # add demographic fields if present in metadata
+        if age_col:
+            input_dict[age_col] = age
+        if gender_col:
+            input_dict[gender_col] = gender_val
+        if jaundice_col:
+            input_dict[jaundice_col] = jaundice_val
+        if family_col:
+            input_dict[family_col] = family_val
 
-    X = np.array(input_vector).reshape(1, -1)
-
-    # Match scaler expectation and adjust if necessary
-    try:
-        expected_n = getattr(scaler, "mean_", None).shape[0]
-    except Exception:
-        expected_n = None
-
-    if expected_n is not None and X.shape[1] != expected_n:
-        st.warning(f"Input length ({X.shape[1]}) != expected features ({expected_n}). Auto-adjusting.")
-        if X.shape[1] < expected_n:
-            pad = expected_n - X.shape[1]
-            X = np.hstack([X, np.zeros((1, pad))])
-        else:
-            X = X[:, :expected_n]
-
-    # Create DataFrame with column names (use subset of feature_cols matching X columns)
-    try:
-        n_cols = X.shape[1]
-        df_cols = feature_cols[:n_cols]
-        X_df = pd.DataFrame(X, columns=df_cols)
-    except Exception:
-        st.error("Failed to create DataFrame with feature names for the scaler.")
-        st.text_area("Traceback", traceback.format_exc(), height=300)
-        st.stop()
-
-    # Scale and predict (suppress sklearn warnings)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+        # Build ordered vector according to feature_cols
         try:
-            Xs = scaler.transform(X_df)
+            input_vector = [input_dict.get(col, 0) for col in feature_cols]
         except Exception:
-            st.error("Error applying scaler to input. Feature types/order may be incompatible.")
+            st.error("Failed to construct input vector from metadata feature columns.")
             st.text_area("Traceback", traceback.format_exc(), height=300)
             st.stop()
 
-    # Predict
-    try:
-        classes = list(getattr(model, "classes_", []))
-        probs = model.predict_proba(Xs)[0] if hasattr(model, "predict_proba") else None
-        pred = model.predict(Xs)[0]
-    except Exception:
-        st.error("Model prediction failed.")
-        st.text_area("Traceback", traceback.format_exc(), height=300)
-        st.stop()
+        X = np.array(input_vector).reshape(1, -1)
 
-    # Determine ASD label index
-    if 0 in classes:
-        asd_label = 0
-    elif 1 in classes:
-        asd_label = 1
-    else:
-        asd_label = classes[0] if classes else 1
+        # Match scaler expectation and adjust if necessary
+        try:
+            expected_n = getattr(scaler, "mean_", None).shape[0]
+        except Exception:
+            expected_n = None
 
-    try:
-        asd_index = classes.index(asd_label) if classes else None
-    except Exception:
-        asd_index = None
+        if expected_n is not None and X.shape[1] != expected_n:
+            st.warning(f"Input length ({X.shape[1]}) != expected features ({expected_n}). Auto-adjusting.")
+            if X.shape[1] < expected_n:
+                pad = expected_n - X.shape[1]
+                X = np.hstack([X, np.zeros((1, pad))])
+            else:
+                X = X[:, :expected_n]
 
-    # Compute ASD probability with safe fallback
-    if probs is not None and asd_index is not None:
-        asd_prob = float(probs[asd_index])
-    else:
-        asd_prob = 1.0 if str(pred) == str(asd_label) else 0.0
+        # Create DataFrame with column names (use subset of feature_cols matching X columns)
+        try:
+            n_cols = X.shape[1]
+            df_cols = feature_cols[:n_cols]
+            X_df = pd.DataFrame(X, columns=df_cols)
+        except Exception:
+            st.error("Failed to create DataFrame with feature names for the scaler.")
+            st.text_area("Traceback", traceback.format_exc(), height=300)
+            st.stop()
 
-    # Compute severity (heuristic)
-    score = sum(answers)
-    if score <= 3:
-        severity = "Low"
-        color = "#28a745"  # green
-    elif score <= 6:
-        severity = "Mild"
-        color = "#ff8c00"  # orange
-    elif score <= 8:
-        severity = "Moderate"
-        color = "#ff4500"  # dark orange/red
-    else:
-        severity = "Severe"
-        color = "#dc3545"  # red
+        # Scale and predict (suppress sklearn warnings)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            try:
+                Xs = scaler.transform(X_df)
+            except Exception:
+                st.error("Error applying scaler to input. Feature types/order may be incompatible.")
+                st.text_area("Traceback", traceback.format_exc(), height=300)
+                st.stop()
 
-    # Update KPIs on right column
-    kpi_prob.markdown(f"### ASD Probability\n**{asd_prob*100:.1f}%**")
-    kpi_sev.markdown(f"### Severity\n<h3 style='color:{color};'>{severity}</h3>", unsafe_allow_html=True)
+        # Predict
+        try:
+            classes = list(getattr(model, "classes_", []))
+            probs = model.predict_proba(Xs)[0] if hasattr(model, "predict_proba") else None
+            pred = model.predict(Xs)[0]
+        except Exception:
+            st.error("Model prediction failed.")
+            st.text_area("Traceback", traceback.format_exc(), height=300)
+            st.stop()
 
-    # Build and render chart
-    risk_data = pd.DataFrame({
-        "Category": ["ASD Risk", "No ASD Risk"],
-        "Probability": [asd_prob, max(0.0, 1 - asd_prob)]
-    })
-    chart_placeholder.bar_chart(risk_data.set_index("Category"))
+        # Determine ASD label index
+        if 0 in classes:
+            asd_label = 0
+        elif 1 in classes:
+            asd_label = 1
+        else:
+            asd_label = classes[0] if classes else 1
 
-    # Summary below columns (full-width)
-    st.markdown("---")
-    st.subheader("Assessment Summary")
-    st.write(f"- **Predicted class:** {pred}")
-    st.write(f"- **Interpreting ASD as label:** `{asd_label}` (model classes: {classes})")
-    st.write(f"- **Calibrated ASD probability:** **{asd_prob*100:.1f}%**")
-    st.write(f"- **Severity (heuristic):** **{severity}** based on {score} positive responses")
-    st.info("This tool is for educational purposes only and is not a medical diagnosis.")
+        try:
+            asd_index = classes.index(asd_label) if classes else None
+        except Exception:
+            asd_index = None
+
+        # Compute ASD probability with safe fallback
+        if probs is not None and asd_index is not None:
+            asd_prob = float(probs[asd_index])
+        else:
+            asd_prob = 1.0 if str(pred) == str(asd_label) else 0.0
+
+        # Compute severity (heuristic)
+        score = sum(answers)
+        if score <= 3:
+            severity = "Low"
+            color = "#28a745"  # green
+        elif score <= 6:
+            severity = "Mild"
+            color = "#ff8c00"  # orange
+        elif score <= 8:
+            severity = "Moderate"
+            color = "#ff4500"  # dark orange/red
+        else:
+            severity = "Severe"
+            color = "#dc3545"  # red
+
+        # Add this run to session history
+        st.session_state.history.append([f"{asd_prob*100:.1f}%", severity])
+
+        # Render KPIs and chart directly under inputs (left column)
+        k1, k2 = st.columns([1, 1])
+        k1.metric("ASD Probability", f"{asd_prob*100:.1f}%")
+        k2.markdown(f"### Severity\n<h3 style='color:{color};'>{severity}</h3>", unsafe_allow_html=True)
+
+        st.markdown("#### Risk distribution")
+        risk_data = pd.DataFrame({
+            "Category": ["ASD Risk", "No ASD Risk"],
+            "Probability": [asd_prob, max(0.0, 1 - asd_prob)]
+        })
+        st.bar_chart(risk_data.set_index("Category"))
+
+        st.markdown("---")
+        st.write(f"- **Predicted class:** {pred}")
+        st.write(f"- **Interpreting ASD as label:** `{asd_label}` (model classes: {classes})")
+        st.write(f"- **Calibrated ASD probability:** **{asd_prob*100:.1f}%**")
+        st.write(f"- **Severity (heuristic):** **{severity}** based on {score} positive responses")
+        st.info("This tool is for educational purposes only and is not a medical diagnosis.")
 
