@@ -30,10 +30,10 @@ The application provides:
 ## 📸 Application Preview
 
 ### Input Interface
-<img width="2000" height="1000" alt="F994AAB5-FC18-4EE3-85EE-8B50FB08C75A" src="<img width="2940" height="1669" alt="0A2B7817-8296-43EE-B403-9D27623F10CB" src="https://github.com/user-attachments/assets/cab4e812-e2f7-498f-960e-1a50bd05523a" />
+<img width="2940" height="1669" alt="0A2B7817-8296-43EE-B403-9D27623F10CB" src="https://github.com/user-attachments/assets/cab4e812-e2f7-498f-960e-1a50bd05523a" />
 
 ### Prediction Output & Visualization
-<img width="2000" height="1000" alt="94347DF7-9C2C-4A42-B59F-46619557738C" src="<img width="2940" height="1656" alt="51100541-73AD-4A36-B6BE-5267AFEA66DE" src="https://github.com/user-attachments/assets/c4eecd3c-4100-492b-9532-eac16bb983ba" />
+<img width="2940" height="1656" alt="51100541-73AD-4A36-B6BE-5267AFEA66DE" src="https://github.com/user-attachments/assets/c4eecd3c-4100-492b-9532-eac16bb983ba" />
 
 ---
 
